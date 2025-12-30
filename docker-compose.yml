@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # ------------------------------------------------------------
+  # SERVICIO 1: BASE DE DATOS (PostgreSQL)
+  # ------------------------------------------------------------
+  db:
+    image: postgres:15-alpine
+    container_name: mrteo-db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: mrteodb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mrteo-network
+
+  # ------------------------------------------------------------
+  # SERVICIO 2: FRONTEND (Tu App Web)
+  # ------------------------------------------------------------
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: mrteo-web
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - db
+    networks:
+      - mrteo-network
+
+  # ------------------------------------------------------------
+  # NUEVO SERVICIO 3: pgAdmin 4 (Administrador Visual de DB)
+  # ------------------------------------------------------------
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: mrteo-pgadmin
+    restart: always
+    environment:
+      # Estas son las credenciales PARA ENTRAR a pgAdmin (no a la BD)
+      PGADMIN_DEFAULT_EMAIL: admin@mrteo.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80" # Lo veremos en el puerto 5050
+    depends_on:
+      - db
+    networks:
+      - mrteo-network
+
+# Definimos una red interna para que se comuniquen entre ellos por nombre
+networks:
+  mrteo-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

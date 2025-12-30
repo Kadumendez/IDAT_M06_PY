@@ -1,0 +1,41 @@
+import { ShoppingCart } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
+import logo from '@/assets/logo-mr-teo.png';
+
+const Navbar = () => {
+  const { totalItems, setIsCartOpen } = useCart();
+
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-50 glass-dark border-b border-border">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        {/* Logo */}
+        <div className="flex items-center gap-3">
+          <img 
+            src={logo} 
+            alt="Mr. Teo Chicken Grill" 
+            className="h-12 w-auto animate-flame"
+          />
+          <span className="font-display text-xl font-bold tracking-wide text-foreground hidden sm:block">
+            MR. TEO
+          </span>
+        </div>
+
+        {/* Cart Button */}
+        <button
+          onClick={() => setIsCartOpen(true)}
+          className="relative p-2 rounded-lg bg-secondary hover:bg-muted transition-colors group"
+          aria-label="Abrir carrito"
+        >
+          <ShoppingCart className="w-6 h-6 text-foreground group-hover:text-fire-orange transition-colors" />
+          {totalItems > 0 && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-xs font-bold text-primary-foreground bg-primary rounded-full animate-pulse-fire">
+              {totalItems}
+            </span>
+          )}
+        </button>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;

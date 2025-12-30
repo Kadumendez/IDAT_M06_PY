@@ -1,5 +1,5 @@
 {
-  "name": "IDAT_M06_PY",
+  "name": "idat-m06-py",
   "private": true,
   "scripts": {
     "build": "turbo run build",

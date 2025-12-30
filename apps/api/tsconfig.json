@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    // Rutas
+    "outDir": "./dist",
+    // "rootDir": "./src",  <-- COMENTAMOS ESTO para que acepte la carpeta prisma
+    // Configuración del Entorno (Para que funcione el Seed)
+    "module": "commonjs",
+    "target": "es2020",
+    "lib": [
+      "esnext"
+    ],
+    // Tipos y Compatibilidad
+    "types": [
+      "node"
+    ],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    // Chequeos Estrictos (Buen código)
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    // Configuración de Módulos (Para evitar el error TS1295)
+    "verbatimModuleSyntax": false,
+    "moduleResolution": "node",
+    "isolatedModules": true
+  },
+  "include": [
+    "src/**/*",
+    "prisma/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

@@ -1,0 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Dark charcoal theme */
+    --background: 0 0% 8%;
+    --foreground: 0 0% 95%;
+
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 95%;
+
+    /* Fire red primary */
+    --primary: 0 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Dark charcoal secondary */
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 60%;
+
+    /* Orange accent */
+    --accent: 16 100% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 16 100% 50%;
+
+    --radius: 0.75rem;
+
+    /* Custom fire colors */
+    --fire-red: 0 100% 50%;
+    --fire-orange: 16 100% 50%;
+    --fire-yellow: 45 100% 50%;
+    --ember: 25 100% 45%;
+    --charcoal: 0 0% 6%;
+    --smoke: 0 0% 40%;
+
+    /* Gradients */
+    --gradient-fire: linear-gradient(135deg, hsl(0 100% 50%), hsl(16 100% 50%), hsl(45 100% 50%));
+    --gradient-ember: linear-gradient(180deg, hsl(16 100% 50%), hsl(0 100% 40%));
+    --gradient-glow: radial-gradient(circle, hsl(16 100% 50% / 0.3), transparent 70%);
+
+    /* Shadows */
+    --shadow-fire: 0 0 30px hsl(16 100% 50% / 0.4);
+    --shadow-ember: 0 4px 20px hsl(0 100% 50% / 0.3);
+
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 16 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 16 100% 50%;
+  }
+
+  .dark {
+    --background: 0 0% 8%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 0 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 16 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 16 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Oswald', sans-serif;
+  }
+}
+
+@layer components {
+  .fire-text {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-fire);
+  }
+
+  .fire-glow {
+    box-shadow: var(--shadow-fire);
+  }
+
+  .ember-glow {
+    box-shadow: var(--shadow-ember);
+  }
+
+  .card-hover-fire {
+    @apply transition-all duration-300;
+  }
+
+  .card-hover-fire:hover {
+    box-shadow: 0 0 20px hsl(var(--fire-orange) / 0.5), 
+                0 0 40px hsl(var(--fire-red) / 0.3);
+    border-color: hsl(var(--fire-orange));
+  }
+
+  .btn-fire {
+    background: var(--gradient-fire);
+    @apply text-white font-semibold transition-all duration-300;
+  }
+
+  .btn-fire:hover {
+    box-shadow: var(--shadow-fire);
+    transform: scale(1.02);
+  }
+
+  .glass-dark {
+    @apply backdrop-blur-md;
+    background: hsl(0 0% 8% / 0.85);
+  }
+}
+
+@layer utilities {
+  .animate-flame {
+    animation: flame 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes flame {
+    0% {
+      filter: brightness(1);
+    }
+    100% {
+      filter: brightness(1.2);
+    }
+  }
+
+  .animate-pulse-fire {
+    animation: pulse-fire 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-fire {
+    0%, 100% {
+      opacity: 1;
+      box-shadow: 0 0 20px hsl(16 100% 50% / 0.5);
+    }
+    50% {
+      opacity: 0.9;
+      box-shadow: 0 0 40px hsl(16 100% 50% / 0.7);
+    }
+  }
+}
