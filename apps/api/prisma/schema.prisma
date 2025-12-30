@@ -37,7 +37,7 @@ model Order {
   createdAt   DateTime @default(now())
   
   // Relación: Un pedido tiene muchos items
-  items       OrderItem[]
+  orderItems       OrderItem[]
 }
 
 // Tabla Detalle de Pedido (Qué platos pidió en esa orden)

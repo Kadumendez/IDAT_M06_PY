@@ -20,7 +20,7 @@ services:
       - mrteo-network
 
   # ------------------------------------------------------------
-  # SERVICIO 2: FRONTEND (Tu App Web)
+  # SERVICIO 2: FRONTEND (App Web)
   # ------------------------------------------------------------
   web:
     build:
@@ -47,13 +47,12 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@mrteo.com
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - "5050:80" # Lo veremos en el puerto 5050
+      - "5050:80"
     depends_on:
       - db
     networks:
       - mrteo-network
 
-# Definimos una red interna para que se comuniquen entre ellos por nombre
 networks:
   mrteo-network:
     driver: bridge

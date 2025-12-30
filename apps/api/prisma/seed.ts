@@ -1,58 +1,69 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 async function main() {
-    console.log('🌱 Iniciando sembrado de datos (Seeding)...')
+    console.log('🌱 Iniciando la siembra de datos...');
 
-    // 1. Limpiar datos viejos (para no duplicar si corres esto 2 veces)
-    // Borramos primero OrderItem, luego Order y al final Product por las relaciones
-    await prisma.orderItem.deleteMany()
-    await prisma.order.deleteMany()
-    await prisma.product.deleteMany()
+    // ----------------------------------------------
+    // 1. PRIMERO: Asegurar de que exista un producto
+    // ----------------------------------------------
 
-    // 2. Crear Productos (El Menú de Mr. Teo)
-    const productos = await prisma.product.createMany({
-        data: [
-            {
-                name: 'Pollo a la Brasa (1/4)',
-                price: 24.90,
-                image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80',
-                category: 'Pollos',
-                description: 'Cuarto de pollo con papas y ensalada.'
-            },
-            {
-                name: 'Mostrito Clásico',
-                price: 32.00,
-                image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80',
-                category: 'Pollos',
-                description: '1/4 de pollo con arroz chaufa y papas.'
-            },
-            {
-                name: 'Inka Kola 1.5L',
-                price: 12.00,
-                image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=800&q=80',
-                category: 'Bebidas',
-                description: 'La bebida del sabor nacional.'
-            },
-            {
-                name: 'Papas Fritas (Porción)',
-                price: 15.00,
-                image: 'https://images.unsplash.com/photo-1630384060421-a4323ceca041?auto=format&fit=crop&w=800&q=80',
-                category: 'Guarniciones',
-                description: 'Papas nativas fritas crujientes.'
-            },
-        ]
-    })
+    let pollo = await prisma.product.findFirst({
+        where: { name: "Pollo a la Brasa" }
+    });
 
-    console.log(`✅ Base de datos llenada con éxito.`)
+    if (!pollo) {
+        console.log('🍗 Creando Pollo a la Brasa...');
+        pollo = await prisma.product.create({
+            data: {
+                name: "Pollo a la Brasa",
+                description: "Clásico con papas y ensalada",
+                price: 58.00,
+                category: "Brasas",
+                image: "https://ejemplo.com/pollo.jpg",
+                available: true
+            }
+        });
+    }
+
+    // -------------------------------------
+    // 2. SEGUNDO: Crear el Pedido de Prueba
+    // -------------------------------------
+
+    if (pollo) {
+        console.log('🧾 Creando pedido para Juan Perez...');
+
+        await prisma.order.create({
+            data: {
+                customerName: "Juan Perez",
+                customerPhone: "999888777",
+                total: 58.00, // Precio del pollo
+                status: "PENDING",
+                orderItems: {
+                    create: [
+                        {
+                            quantity: 1,
+                            price: 58.00,
+                            productId: pollo.id
+                        }
+                    ]
+                }
+            }
+        });
+        console.log('✅ ¡Pedido creado con éxito!');
+    }
 }
 
+// --------------------------------------------------------
+// BOILERPLATE (Código necesario para ejecutar)
+// --------------------------------------------------------
 main()
-    .catch((e) => {
-        console.error(e)
-        process.exit(1)
+    .then(async () => {
+        await prisma.$disconnect();
     })
-    .finally(async () => {
-        await prisma.$disconnect()
-    })
+    .catch(async (e) => {
+        console.error(e);
+        await prisma.$disconnect();
+        process.exit(1);
+    });
