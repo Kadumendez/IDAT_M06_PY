@@ -18,38 +18,25 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # --- PASO 1: LIMPIEZA DE EMERGENCIA ---
-            echo "🧹 Liberando espacio en disco..."
-            
-            # 1. Borrar la Swap (Ya no la necesitas en t3.medium y ocupa 2GB)
-            if [ -f /swapfile ]; then
-                sudo swapoff /swapfile || true
-                sudo rm -f /swapfile
-                echo "✅ Swap eliminada (2GB recuperados)"
-            fi
-
-            # 2. Borrar contenedores, imágenes y redes viejas
-            sudo docker system prune -af
-            sudo docker volume prune -f
-            
-            # 3. Matar cualquier proceso rebelde (como el pgadmin que salía en el error)
-            sudo docker rm -f mrteo-pgadmin || true
-
-            # --- PASO 2: DESPLIEGUE ---
-            DIR="/home/ubuntu/mr-teo-project"
-            
-            # Si la carpeta no existe, clonamos
-            if [ ! -d "$DIR" ]; then
-              git clone https://github.com/Kadumendez/IDAT_M06_PY.git $DIR
-            else
-              cd $DIR
-              git reset --hard
-              git pull origin main
-            fi
-
-            cd $DIR
-            
-            # Levantamos todo limpio
-            echo "🚀 Levantando proyecto..."
+            # --- LIMPIEZA TOTAL ---
+            echo "🧹 Limpiando Docker y archivos viejos..."
             sudo docker-compose down --remove-orphans || true
+            sudo docker system prune -af
+
+            # --- LA CLAVE: BORRÓN Y CUENTA NUEVA ---
+            # Como hicimos git reset, la historia no coincide.
+            # Borramos la carpeta entera para clonar limpio.
+            DIR="/home/ubuntu/mr-teo-project"
+            sudo rm -rf $DIR
+
+            # --- CLONAR DESDE CERO ---
+            echo "📥 Clonando código fresco..."
+            git clone https://github.com/Kadumendez/IDAT_M06_PY.git $DIR
+            cd $DIR
+
+            # --- LEVANTAR ---
+            echo "🚀 Levantando proyecto..."
+            # Aseguramos permisos (a veces clonar como root da problemas)
+            sudo chown -R ubuntu:ubuntu .
+            
             sudo docker-compose up -d --build
