@@ -18,34 +18,30 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # --- PASO 1: EXTINCIÓN TOTAL (Matar Zombies) ---
-            echo "☢️ Iniciando limpieza nuclear de Docker..."
-            
-            # Forzamos la detención y borrado de CUALQUIER contenedor vivo o muerto
-            # Usamos "|| true" para que no falle si no hay nada
+            # --- PASO 0: ELECTROSHOCK (Reiniciar Cerebro Docker) ---
+            echo "⚡ Reiniciando servicio Docker para eliminar fantasmas..."
+            sudo systemctl restart docker
+            sleep 10  # Damos tiempo a que despierte
+
+            # --- PASO 1: LIMPIEZA POST-REINICIO ---
+            echo "🧹 Limpiando zona..."
+            # Ahora que reiniciamos, este comando sí funcionará sin errores
             sudo docker stop $(sudo docker ps -aq) || true
             sudo docker rm -f $(sudo docker ps -aq) || true
-            
-            # Borramos redes y volúmenes huérfanos que causan el conflicto
-            sudo docker network prune -f || true
-            sudo docker volume prune -f || true
-            
-            # Limpiamos basura del sistema
             sudo docker system prune -af --volumes
 
-            # --- PASO 2: BORRÓN DE CÓDIGO ---
+            # --- PASO 2: BORRÓN Y CUENTA NUEVA DE CÓDIGO ---
             DIR="/home/ubuntu/mr-teo-project"
-            echo "🧹 Borrando carpeta de proyecto corrupta..."
             sudo rm -rf $DIR
 
-            # --- PASO 3: RE-INSTALACIÓN LIMPIA ---
-            echo "📥 Clonando desde cero..."
+            # --- PASO 3: RE-INSTALACIÓN ---
+            echo "📥 Clonando código limpio..."
             git clone https://github.com/Kadumendez/IDAT_M06_PY.git $DIR
             cd $DIR
-
-            # Aseguramos permisos
-            sudo chown -R ubuntu:ubuntu .
             
+            # Permisos
+            sudo chown -R ubuntu:ubuntu .
+
             # --- PASO 4: LEVANTAR ---
-            echo "🚀 Levantando proyecto (intento definitivo)..."
+            echo "🚀 Despegando..."
             sudo docker-compose up -d --build
