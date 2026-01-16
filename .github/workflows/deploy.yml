@@ -19,9 +19,6 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Run Tests (Simulated)
-        run: echo "Tests passed!"
-
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@master
         with:
@@ -29,8 +26,24 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Esto es lo que se ejecuta en el servidor real
-            cd /home/ubuntu/mr-teo-project
-            git pull origin main
-            docker-compose down
-            docker-compose up -d --build
+            # 1. Definimos la carpeta y el repo
+            DIR="/home/ubuntu/mr-teo-project"
+            REPO="https://github.com/Kadumendez/IDAT_M06_PY.git"
+
+            # 2. Lógica Inteligente: ¿Existe la carpeta?
+            if [ ! -d "$DIR" ]; then
+              echo "La carpeta no existe. Clonando repositorio por primera vez..."
+              git clone $REPO $DIR
+            else
+              echo "La carpeta existe. Actualizando código..."
+              cd $DIR
+              git pull origin main
+            fi
+
+            # 3. Entrar y levantar Docker
+            cd $DIR
+            
+            # Usamos sudo para asegurar que Docker tenga permisos
+            echo "Reiniciando contenedores..."
+            sudo docker-compose down || true
+            sudo docker-compose up -d --build
