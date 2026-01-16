@@ -11,14 +11,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install Dependencies
-        run: npm install
-
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@master
         with:
@@ -26,24 +18,32 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # 1. Definimos la carpeta y el repo
+            # --- PASO 0: TRUCO ANTI-CAÍDAS (SWAP) ---
+            # Creamos 2GB de RAM falsa usando el disco duro para que no explote
+            if [ ! -f /swapfile ]; then
+                echo "⚠️ Creando Swap de 2GB por falta de RAM..."
+                sudo fallocate -l 2G /swapfile
+                sudo chmod 600 /swapfile
+                sudo mkswap /swapfile
+                sudo swapon /swapfile
+                echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+            fi
+            
+            # Variables
             DIR="/home/ubuntu/mr-teo-project"
             REPO="https://github.com/Kadumendez/IDAT_M06_PY.git"
 
-            # 2. Lógica Inteligente: ¿Existe la carpeta?
+            # 1. Clonar o Actualizar
             if [ ! -d "$DIR" ]; then
-              echo "La carpeta no existe. Clonando repositorio por primera vez..."
               git clone $REPO $DIR
             else
-              echo "La carpeta existe. Actualizando código..."
               cd $DIR
               git pull origin main
             fi
 
-            # 3. Entrar y levantar Docker
+            # 2. Reiniciar Docker con cuidado
             cd $DIR
-            
-            # Usamos sudo para asegurar que Docker tenga permisos
-            echo "Reiniciando contenedores..."
+            echo "🚀 Levantando contenedores..."
             sudo docker-compose down || true
+            # Usamos --build para asegurar cambios, la Swap aguantará la carga ahora
             sudo docker-compose up -d --build
