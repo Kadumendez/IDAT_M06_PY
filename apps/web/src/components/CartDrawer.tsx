@@ -5,21 +5,20 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { toast } from 'sonner';
 
 const CartDrawer = () => {
-  const {
-    items, isCartOpen, setIsCartOpen, updateQuantity, removeItem, clearCart, getTotalPrice
-  } = useCartStore();
+  const { items, isCartOpen, setIsCartOpen, updateQuantity, removeItem, clearCart, getTotalPrice } =
+    useCartStore();
 
   const [isProcessing, setIsProcessing] = useState(false); // Estado de carga
   const totalPrice = getTotalPrice();
 
   const handleCheckout = async () => {
     // 1. Pedir datos rápidos al usuario (Ventanas emergentes simples)
-    const name = window.prompt("¿A nombre de quién sale el pedido?");
+    const name = window.prompt('¿A nombre de quién sale el pedido?');
     if (!name) return; // Si cancela, no hacemos nada
 
-    const phone = window.prompt("Número de contacto (9 dígitos):", "999888777");
+    const phone = window.prompt('Número de contacto (9 dígitos):', '999888777');
     if (!phone || phone.length !== 9) {
-      toast.error("Ingresa un número válido de 9 dígitos");
+      toast.error('Ingresa un número válido de 9 dígitos');
       return;
     }
 
@@ -31,18 +30,18 @@ const CartDrawer = () => {
         customerName: name,
         customerPhone: phone,
         total: totalPrice,
-        items: items.map(item => ({
+        items: items.map((item) => ({
           productId: Number(item.id), // Aseguramos que sea número
           quantity: item.quantity,
-          price: item.price
-        }))
+          price: item.price,
+        })),
       };
 
       // 3. Enviar al Backend (POST)
       const response = await fetch('http://localhost:3001/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
+        body: JSON.stringify(orderData),
       });
 
       if (!response.ok) {
@@ -57,10 +56,9 @@ const CartDrawer = () => {
       // Limpiamos todo para el siguiente cliente
       clearCart();
       setIsCartOpen(false);
-
     } catch (error) {
       console.error(error);
-      toast.error("Hubo un error al enviar el pedido. Revisa que el Backend esté encendido.");
+      toast.error('Hubo un error al enviar el pedido. Revisa que el Backend esté encendido.');
     } finally {
       setIsProcessing(false);
     }
@@ -86,21 +84,41 @@ const CartDrawer = () => {
           <>
             <div className="flex-1 overflow-y-auto py-4 space-y-4">
               {items.map((item) => (
-                <div key={item.id} className="flex gap-4 p-3 rounded-lg bg-secondary/50 border border-border">
-                  <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg" />
+                <div
+                  key={item.id}
+                  className="flex gap-4 p-3 rounded-lg bg-secondary/50 border border-border"
+                >
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-20 h-20 object-cover rounded-lg"
+                  />
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-display font-semibold text-foreground truncate">{item.name}</h4>
-                    <p className="text-fire-yellow font-bold">S/{(item.price * item.quantity).toFixed(2)}</p>
+                    <h4 className="font-display font-semibold text-foreground truncate">
+                      {item.name}
+                    </h4>
+                    <p className="text-fire-yellow font-bold">
+                      S/{(item.price * item.quantity).toFixed(2)}
+                    </p>
 
                     <div className="flex items-center gap-2 mt-2">
-                      <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="w-7 h-7 rounded-md bg-muted flex items-center justify-center hover:bg-fire-orange/20">
+                      <button
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        className="w-7 h-7 rounded-md bg-muted flex items-center justify-center hover:bg-fire-orange/20"
+                      >
                         <Minus className="w-4 h-4" />
                       </button>
                       <span className="w-8 text-center font-medium">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="w-7 h-7 rounded-md bg-muted flex items-center justify-center hover:bg-fire-orange/20">
+                      <button
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        className="w-7 h-7 rounded-md bg-muted flex items-center justify-center hover:bg-fire-orange/20"
+                      >
                         <Plus className="w-4 h-4" />
                       </button>
-                      <button onClick={() => removeItem(item.id)} className="ml-auto text-muted-foreground hover:text-destructive">
+                      <button
+                        onClick={() => removeItem(item.id)}
+                        className="ml-auto text-muted-foreground hover:text-destructive"
+                      >
                         <X className="w-5 h-5" />
                       </button>
                     </div>
@@ -136,7 +154,10 @@ const CartDrawer = () => {
                 )}
               </button>
 
-              <button onClick={clearCart} className="w-full py-2 text-muted-foreground hover:text-destructive transition-colors text-sm">
+              <button
+                onClick={clearCart}
+                className="w-full py-2 text-muted-foreground hover:text-destructive transition-colors text-sm"
+              >
                 Vaciar carrito
               </button>
             </div>

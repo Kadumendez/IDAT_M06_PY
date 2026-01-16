@@ -8,7 +8,11 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div className="space-y-4 flex flex-col items-center md:items-start">
-            <img src={logo} alt="Mr. Teo Chicken Grill" className="h-24 w-auto drop-shadow-[0_0_15px_rgba(255,69,0,0.5)]" />
+            <img
+              src={logo}
+              alt="Mr. Teo Chicken Grill"
+              className="h-24 w-auto drop-shadow-[0_0_15px_rgba(255,69,0,0.5)]"
+            />
             <p className="text-fire-orange font-display text-lg font-semibold tracking-wide">
               Pollos a la brasa desde 1995
             </p>

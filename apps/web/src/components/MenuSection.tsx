@@ -31,7 +31,7 @@ const MenuSection = () => {
         const data = await response.json();
         setProducts(data); // Guardamos los pollos reales en el estado
       } catch (err) {
-        console.error("Error fetching menu:", err);
+        console.error('Error fetching menu:', err);
         setError('Hubo un problema cargando el menú. Intenta refrescar.');
       } finally {
         setLoading(false); // Terminamos de cargar (sea éxito o error)
@@ -57,7 +57,8 @@ const MenuSection = () => {
             Sabores que <span className="fire-text">Encienden</span> tu Paladar
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Cada plato preparado con la pasión del fuego y la tradición de nuestras recetas secretas.
+            Cada plato preparado con la pasión del fuego y la tradición de nuestras recetas
+            secretas.
           </p>
         </div>
 
@@ -73,7 +74,9 @@ const MenuSection = () => {
         {error && (
           <div className="text-center text-red-500 py-10">
             <p>{error}</p>
-            <p className="text-sm text-gray-400 mt-2">Asegúrate de que el Backend (puerto 3001) esté encendido.</p>
+            <p className="text-sm text-gray-400 mt-2">
+              Asegúrate de que el Backend (puerto 3001) esté encendido.
+            </p>
           </div>
         )}
 
@@ -91,7 +94,9 @@ const MenuSection = () => {
                   name={product.name}
                   description={product.description || ''} // Manejamos nulos
                   price={Number(product.price)} // <--- IMPORTANTE: Convertimos texto "58" a número 58
-                  image={product.image || 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6'} // Imagen por defecto si no hay
+                  image={
+                    product.image || 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6'
+                  } // Imagen por defecto si no hay
                 />
               </div>
             ))}

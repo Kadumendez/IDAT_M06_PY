@@ -15,7 +15,7 @@ const ProductCard = ({ id, name, description, price, image }: ProductCardProps) 
 
   const handleAddToCart = () => {
     addItem({ id, name, price, image });
-    toast.success("Agregado al fuego 🔥");
+    toast.success('Agregado al fuego 🔥');
   };
 
   return (
@@ -33,9 +33,7 @@ const ProductCard = ({ id, name, description, price, image }: ProductCardProps) 
         <h3 className="font-display text-xl font-semibold text-foreground mb-2 group-hover:text-fire-orange transition-colors">
           {name}
         </h3>
-        <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-          {description}
-        </p>
+        <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{description}</p>
 
         <div className="flex items-center justify-between gap-4">
           <span className="font-display text-2xl font-bold text-fire-yellow">

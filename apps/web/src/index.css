@@ -100,7 +100,12 @@
     font-family: 'Inter', sans-serif;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Oswald', sans-serif;
   }
 }
@@ -124,8 +129,9 @@
   }
 
   .card-hover-fire:hover {
-    box-shadow: 0 0 20px hsl(var(--fire-orange) / 0.5), 
-                0 0 40px hsl(var(--fire-red) / 0.3);
+    box-shadow:
+      0 0 20px hsl(var(--fire-orange) / 0.5),
+      0 0 40px hsl(var(--fire-red) / 0.3);
     border-color: hsl(var(--fire-orange));
   }
 
@@ -164,7 +170,8 @@
   }
 
   @keyframes pulse-fire {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
       box-shadow: 0 0 20px hsl(16 100% 50% / 0.5);
     }
