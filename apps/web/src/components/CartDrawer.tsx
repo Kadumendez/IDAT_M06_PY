@@ -1,20 +1,70 @@
-import { X, Minus, Plus, Flame, ShoppingBag } from 'lucide-react';
-import { useCartStore } from '../store/cartStore'; // <--- Usamos Zustand
+import { useState } from 'react';
+import { X, Minus, Plus, Flame, ShoppingBag, Loader2 } from 'lucide-react';
+import { useCartStore } from '../store/cartStore';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { toast } from 'sonner';
 
 const CartDrawer = () => {
-  // Conectamos con Zustand
   const {
-    items,
-    isCartOpen,
-    setIsCartOpen,
-    updateQuantity,
-    removeItem,
-    clearCart,
-    getTotalPrice
+    items, isCartOpen, setIsCartOpen, updateQuantity, removeItem, clearCart, getTotalPrice
   } = useCartStore();
 
-  const totalPrice = getTotalPrice(); // Calculamos el total
+  const [isProcessing, setIsProcessing] = useState(false); // Estado de carga
+  const totalPrice = getTotalPrice();
+
+  const handleCheckout = async () => {
+    // 1. Pedir datos rápidos al usuario (Ventanas emergentes simples)
+    const name = window.prompt("¿A nombre de quién sale el pedido?");
+    if (!name) return; // Si cancela, no hacemos nada
+
+    const phone = window.prompt("Número de contacto (9 dígitos):", "999888777");
+    if (!phone || phone.length !== 9) {
+      toast.error("Ingresa un número válido de 9 dígitos");
+      return;
+    }
+
+    setIsProcessing(true); // Activamos el spinner de carga
+
+    try {
+      // 2. Preparar los datos tal cual los pide el Backend nuevo
+      const orderData = {
+        customerName: name,
+        customerPhone: phone,
+        total: totalPrice,
+        items: items.map(item => ({
+          productId: Number(item.id), // Aseguramos que sea número
+          quantity: item.quantity,
+          price: item.price
+        }))
+      };
+
+      // 3. Enviar al Backend (POST)
+      const response = await fetch('http://localhost:3001/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al procesar');
+      }
+
+      // 4. Éxito
+      const data = await response.json();
+      toast.success(`¡Pedido #${data.data.id} enviado a cocina! 👨‍🍳🔥`);
+
+      // Limpiamos todo para el siguiente cliente
+      clearCart();
+      setIsCartOpen(false);
+
+    } catch (error) {
+      console.error(error);
+      toast.error("Hubo un error al enviar el pedido. Revisa que el Backend esté encendido.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
@@ -66,10 +116,26 @@ const CartDrawer = () => {
                   S/{totalPrice.toFixed(2)}
                 </span>
               </div>
-              <button className="w-full btn-fire py-4 rounded-lg font-display text-lg font-semibold uppercase tracking-wider flex items-center justify-center gap-2">
-                <Flame className="w-5 h-5" />
-                Pagar Orden
+
+              {/* BOTÓN PAGAR CONECTADO */}
+              <button
+                onClick={handleCheckout}
+                disabled={isProcessing}
+                className="w-full btn-fire py-4 rounded-lg font-display text-lg font-semibold uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Enviando...
+                  </>
+                ) : (
+                  <>
+                    <Flame className="w-5 h-5" />
+                    Pagar Orden
+                  </>
+                )}
               </button>
+
               <button onClick={clearCart} className="w-full py-2 text-muted-foreground hover:text-destructive transition-colors text-sm">
                 Vaciar carrito
               </button>

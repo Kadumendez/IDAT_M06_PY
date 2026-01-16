@@ -1,13 +1,14 @@
 import { z } from 'zod';
 
-// Aquí definimos las reglas de seguridad
 export const CreateOrderSchema = z.object({
-    customerName: z.string().min(2, { message: "El nombre es muy corto (mínimo 2 letras)" }),
-    customerPhone: z.string().length(9, { message: "El celular debe tener exactamente 9 dígitos" }),
+    customerName: z.string().min(2),
+    customerPhone: z.string().length(9),
+    total: z.number(),
     items: z.array(
         z.object({
-            productId: z.number({ required_error: "El ID del producto es obligatorio" }),
-            quantity: z.number().min(1, { message: "La cantidad debe ser al menos 1" })
+            productId: z.number(),
+            quantity: z.number().min(1),
+            price: z.number() // <--- GUARDA EL PRECIO HISTÓRICO
         })
-    ).min(1, { message: "El carrito no puede estar vacío" })
+    ).min(1)
 });
