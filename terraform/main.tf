@@ -44,23 +44,30 @@ resource "aws_security_group" "mr_teo_sg" {
 
 # 3. La Instancia EC2 (El Servidor Virtual)
 resource "aws_instance" "mr_teo_server" {
-  ami           = "ami-0c7217cdde317cfec" # Ubuntu 22.04 LTS (Gratis)
-  instance_type = "t2.micro"              # Capa Gratuita
+  ami           = "ami-0c7217cdde317cfec" # Ubuntu 22.04
+  instance_type = "t2.micro"
 
-  # Vinculamos el firewall que creamos arriba
+  # --- ESTA ES LA LÍNEA NUEVA IMPORTANTE ---
+  key_name = "mr-teo-key" # El nombre exacto que pusiste en AWS
+  # -----------------------------------------
+
   vpc_security_group_ids = [aws_security_group.mr_teo_sg.id]
 
   tags = {
-    Name    = "MrTeo-Server-MVP"
-    Project = "IDAT_M06_PY"
+    Name = "MrTeo-Server-MVP"
   }
 
-  # Script de inicio (User Data) - Instala Docker automáticamente al encender
   user_data = <<-EOF
               #!/bin/bash
               apt-get update
-              apt-get install -y docker.io docker-compose
+              apt-get install -y docker.io docker-compose git
               systemctl start docker
               systemctl enable docker
+              usermod -aG docker ubuntu
               EOF
+}
+
+# Agrega esto al final del archivo para que te diga la IP al terminar
+output "server_public_ip" {
+  value = aws_instance.mr_teo_server.public_ip
 }

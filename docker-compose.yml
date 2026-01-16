@@ -20,30 +20,49 @@ services:
       - mrteo-network
 
   # ------------------------------------------------------------
-  # SERVICIO 2: FRONTEND (App Web)
+  # SERVICIO 2: BACKEND (API)
   # ------------------------------------------------------------
-  web:
+  api:
     build:
-      context: ./apps/web
-      dockerfile: Dockerfile
-    container_name: mrteo-web
+      context: .
+      dockerfile: apps/api/Dockerfile # Asegúrate de tener este Dockerfile
+    container_name: mrteo-api
     restart: always
     ports:
-      - '3000:80'
+      - '3001:3001' # Puerto donde escucha tu Express
+    environment:
+      # OJO: Aquí 'db' es el nombre del servicio de arriba, no localhost
+      DATABASE_URL: "postgresql://admin:password123@db:5432/mrteodb?schema=public"
+      PORT: 3001
     depends_on:
       - db
     networks:
       - mrteo-network
 
   # ------------------------------------------------------------
-  # NUEVO SERVICIO 3: pgAdmin 4 (Administrador Visual de DB)
+  # SERVICIO 3: FRONTEND (App Web)
+  # ------------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile # Asegúrate de tener este Dockerfile
+    container_name: mrteo-web
+    restart: always
+    ports:
+      - '8080:80' # Mapeamos al 8080 para no chocar con otros
+    depends_on:
+      - api # El front depende de que la API exista
+    networks:
+      - mrteo-network
+
+  # ------------------------------------------------------------
+  # SERVICIO 4: pgAdmin 4 (Administrador Visual)
   # ------------------------------------------------------------
   pgadmin:
     image: dpage/pgadmin4
     container_name: mrteo-pgadmin
     restart: always
     environment:
-      # Estas son las credenciales PARA ENTRAR a pgAdmin (no a la BD)
       PGADMIN_DEFAULT_EMAIL: admin@mrteo.com
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:

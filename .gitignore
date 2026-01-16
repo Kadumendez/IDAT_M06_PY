@@ -39,3 +39,4 @@ yarn-error.log*
 
 # Archivos personales
 /SEGUIMIENTO.txt
+.terraform/
