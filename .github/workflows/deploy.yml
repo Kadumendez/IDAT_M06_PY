@@ -18,32 +18,38 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # --- PASO 0: TRUCO ANTI-CAÍDAS (SWAP) ---
-            # Creamos 2GB de RAM falsa usando el disco duro para que no explote
-            if [ ! -f /swapfile ]; then
-                echo "⚠️ Creando Swap de 2GB por falta de RAM..."
-                sudo fallocate -l 2G /swapfile
-                sudo chmod 600 /swapfile
-                sudo mkswap /swapfile
-                sudo swapon /swapfile
-                echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-            fi
+            # --- PASO 1: LIMPIEZA DE EMERGENCIA ---
+            echo "🧹 Liberando espacio en disco..."
             
-            # Variables
-            DIR="/home/ubuntu/mr-teo-project"
-            REPO="https://github.com/Kadumendez/IDAT_M06_PY.git"
+            # 1. Borrar la Swap (Ya no la necesitas en t3.medium y ocupa 2GB)
+            if [ -f /swapfile ]; then
+                sudo swapoff /swapfile || true
+                sudo rm -f /swapfile
+                echo "✅ Swap eliminada (2GB recuperados)"
+            fi
 
-            # 1. Clonar o Actualizar
+            # 2. Borrar contenedores, imágenes y redes viejas
+            sudo docker system prune -af
+            sudo docker volume prune -f
+            
+            # 3. Matar cualquier proceso rebelde (como el pgadmin que salía en el error)
+            sudo docker rm -f mrteo-pgadmin || true
+
+            # --- PASO 2: DESPLIEGUE ---
+            DIR="/home/ubuntu/mr-teo-project"
+            
+            # Si la carpeta no existe, clonamos
             if [ ! -d "$DIR" ]; then
-              git clone $REPO $DIR
+              git clone https://github.com/Kadumendez/IDAT_M06_PY.git $DIR
             else
               cd $DIR
+              git reset --hard
               git pull origin main
             fi
 
-            # 2. Reiniciar Docker con cuidado
             cd $DIR
-            echo "🚀 Levantando contenedores..."
-            sudo docker-compose down || true
-            # Usamos --build para asegurar cambios, la Swap aguantará la carga ahora
+            
+            # Levantamos todo limpio
+            echo "🚀 Levantando proyecto..."
+            sudo docker-compose down --remove-orphans || true
             sudo docker-compose up -d --build
