@@ -23,17 +23,17 @@ services:
   # SERVICIO 2: BACKEND (API)
   # ------------------------------------------------------------
   api:
+    api:
     build:
       context: .
-      dockerfile: apps/api/Dockerfile # Asegúrate de tener este Dockerfile
-    container_name: mrteo-api
+      dockerfile: apps/api/Dockerfile
     restart: always
     ports:
-      - '3001:3001' # Puerto donde escucha tu Express
+      - '3001:3001'
     environment:
-      # OJO: Aquí 'db' es el nombre del servicio de arriba, no localhost
       DATABASE_URL: "postgresql://admin:password123@db:5432/mrteodb?schema=public"
       PORT: 3001
+      NODE_ENV: "development" # Forzamos modo ligero
     depends_on:
       - db
     networks:
@@ -45,13 +45,12 @@ services:
   web:
     build:
       context: .
-      dockerfile: apps/web/Dockerfile # Asegúrate de tener este Dockerfile
-    container_name: mrteo-web
+      dockerfile: apps/web/Dockerfile
     restart: always
     ports:
-      - '80:80' # Mapeamos al 80 para no chocar con otros
+      - '80:80'
     depends_on:
-      - api # El front depende de que la API exista
+      - api
     networks:
       - mrteo-network
 
