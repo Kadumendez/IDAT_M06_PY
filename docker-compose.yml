@@ -49,7 +49,7 @@ services:
     container_name: mrteo-web
     restart: always
     ports:
-      - '8080:80' # Mapeamos al 8080 para no chocar con otros
+      - '80:80' # Mapeamos al 80 para no chocar con otros
     depends_on:
       - api # El front depende de que la API exista
     networks:
